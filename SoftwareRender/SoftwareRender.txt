@@ -1,0 +1,1 @@
+./Debug/src_main.cpp.o ./Debug/src_SDLApp.cpp.o ./Debug/src_SoftwareRender.cpp.o
