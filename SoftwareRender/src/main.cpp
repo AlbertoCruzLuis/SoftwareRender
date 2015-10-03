@@ -1,37 +1,42 @@
 #include <iostream>
 #include <SDL2/SDL.h>
-#include <cstdlib>
-#include <cstdint>
-#include <cmath>
 #include "SDLApp.h"
 #include "IAppHandler.h"
-
-const float PI = 3.14;
+#include "Model.h"
 
 class TestApp : public IAppHandler {
-
+private:  
+  Model* model;
 public:
+  virtual void onInit() {
+    model = new Model("../data/model.obj");
+  };
   virtual void onDraw(SoftwareRender& render) {
-    //render.clear(0);
-    int cx = 400, cy = 400;
-    int r = 50 + std::rand() % 200;
-    uint32_t color = ((std::rand() % 0xFFFFFF) << 8)|0xFF;
-    for(float i = 0; i < 2 * PI; i += PI / 512.0) {
-      render.drawLine(cx,
-                      cy,
-                      cx + std::cos(i) * r,
-                      cy + std::sin(i) * r,
-                      color);
+    render.clear(0);
+    // Матриц пока нет, по этому делаем коррекции вот так, криво :D
+    for(int i = 0; i < model->facesCount(); i++) {
+      render.drawLine(512 + (model->vert(i, 0).x) / 2 * 1024,
+                      384 + (model->vert(i, 0).y) / 2 * 768,
+                      512 + (model->vert(i, 1).x) / 2 * 1024,
+                      384 + (model->vert(i, 1).y) / 2 * 768,
+                      0xFFFFFFFF);
+      render.drawLine(512 + (model->vert(i, 1).x) / 2 * 1024,
+                      384 + (model->vert(i, 1).y) / 2 * 768,
+                      512 + (model->vert(i, 2).x) / 2 * 1024,
+                      384 + (model->vert(i, 2).y) / 2 * 768,
+                      0xFFFFFFFF);
+      render.drawLine(512 + (model->vert(i, 2).x) / 2 * 1024,
+                      384 + (model->vert(i, 2).y) / 2 * 768,
+                      512 + (model->vert(i, 0).x) / 2 * 1024,
+                      384 + (model->vert(i, 0).y) / 2 * 768,
+                      0xFFFFFFFF);
     }
-  };
-  virtual void onExit(){
-
-  };
-  virtual void onInit(){
-
   };
   virtual void onProc(double dt, SDL_Event& lastEvent){
 
+  };
+  virtual void onExit() {
+    delete model;
   };
 };
 

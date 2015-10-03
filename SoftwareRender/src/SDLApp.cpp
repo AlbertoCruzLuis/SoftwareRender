@@ -39,6 +39,9 @@ SDLApp::start(unsigned int width, unsigned int height, IAppHandler* handler) {
     handler->onProc(dt, lastEvent);
     if(lastEvent.type == SDL_QUIT) {
       exitFlag = true;
+    } else if (lastEvent.type == SDL_KEYDOWN) {
+      if (lastEvent.key.keysym.scancode == SDL_SCANCODE_ESCAPE)
+        exitFlag = true;
     }
     // Рендер
     // Вызываем оперделяемый пользователем метод отрисовки

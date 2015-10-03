@@ -31,7 +31,7 @@ void SoftwareRender::clear(uint32_t color) {
 }
 
 int SoftwareRender::pixelIndex(int x, int y) {
-  return (y*width + x);
+  return ((height-y)*width + x);
 }
 
 void SoftwareRender::setPixelUnsafe(int x, int y, uint32_t color) {
@@ -65,9 +65,9 @@ void SoftwareRender::drawLine(int x1, int y1, int x2, int y2, uint32_t color) {
         {
               setPixel(x, y, color);
               x += dx;
-              d += lengthY << 1;
+              d += lengthY << 1; // * 2
               if (d > 0) {
-                    d -= lengthX << 1;
+                    d -= lengthX << 1; 
                     y += dy;
               }
         }

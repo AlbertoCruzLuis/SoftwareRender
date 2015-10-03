@@ -60,7 +60,7 @@ AS       := /usr/bin/as
 ## User defined environment variables
 ##
 CodeLiteDir:=/usr/share/codelite
-Objects0=$(IntermediateDirectory)/src_main.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_SDLApp.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_SoftwareRender.cpp$(ObjectSuffix) 
+Objects0=$(IntermediateDirectory)/src_main.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_SDLApp.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_SoftwareRender.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_Model.cpp$(ObjectSuffix) 
 
 
 
@@ -114,6 +114,14 @@ $(IntermediateDirectory)/src_SoftwareRender.cpp$(DependSuffix): src/SoftwareRend
 
 $(IntermediateDirectory)/src_SoftwareRender.cpp$(PreprocessSuffix): src/SoftwareRender.cpp
 	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_SoftwareRender.cpp$(PreprocessSuffix) "src/SoftwareRender.cpp"
+
+$(IntermediateDirectory)/src_Model.cpp$(ObjectSuffix): src/Model.cpp $(IntermediateDirectory)/src_Model.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/pacmancoder/Dropbox/SoftwareRender/SoftwareRender/src/Model.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/src_Model.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/src_Model.cpp$(DependSuffix): src/Model.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/src_Model.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/src_Model.cpp$(DependSuffix) -MM "src/Model.cpp"
+
+$(IntermediateDirectory)/src_Model.cpp$(PreprocessSuffix): src/Model.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_Model.cpp$(PreprocessSuffix) "src/Model.cpp"
 
 
 -include $(IntermediateDirectory)/*$(DependSuffix)
