@@ -8,52 +8,52 @@ using namespace std;
 
 SoftwareRender::SoftwareRender(int renderWidth,
                                int renderHeight,
-                               uint32_t* renderOutput) {
-  width = renderWidth;
-  height = renderHeight;
-  pixels = renderOutput;  
+                               uint32_t* renderOutput)
+    : transMatrix() {
+    width = renderWidth;
+    height = renderHeight;
+    pixels = renderOutput;
 }
 
 SoftwareRender::~SoftwareRender() {
 }
 
 void SoftwareRender::setPixel(int x, int y, uint32_t color) {
-  if ((x < width) && (y < height) && (x >= 0) && (y >= 0))
-    pixels[pixelIndex(x,y)] = color;
+    if((x < width) && (y < height) && (x >= 0) && (y >= 0))
+        pixels[pixelIndex(x, y)] = color;
 }
-
-
 
 /* PRIVATE */
 
 void SoftwareRender::clear(uint32_t color) {
-  std::fill_n(pixels, width * height, color);
+    std::fill_n(pixels, width * height, color);
 }
 
 int SoftwareRender::pixelIndex(int x, int y) {
-  return ((height-y)*width + x);
+    return ((height - y) * width + x);
 }
 
 void SoftwareRender::setPixelUnsafe(int x, int y, uint32_t color) {
-  pixels[pixelIndex(x,y)] = color;
+    pixels[pixelIndex(x, y)] = color;
 }
 
-void SoftwareRender::drawLine(int x1, int y1, int x2, int y2, uint32_t color) {
-  // В какую сторону смещаемся.
-  int dx = (x2 - x1 >= 0 ? 1 : -1);
-  int dy = (y2 - y1 >= 0 ? 1 : -1);
-  // Проекции на оси
-  int lengthX = abs(x2 - x1);
-  int lengthY = abs(y2 - y1);
-  //  Не является ли отрезок точкой
-  int length = max(lengthX, lengthY);
-  if (length == 0)
-  {
+void SoftwareRender::drawLine(Vec3f v1, Vec3f v2, uint32_t color) {
+    v1 = transMatrix.transformVec(v1);
+    v2 = transMatrix.transformVec(v2);
+    int x1 = v1.x, x2 = v2.x, y1 = v1.y, y2 = v2.y;
+    // В какую сторону смещаемся.
+    int dx = (x2 - x1 >= 0 ? 1 : -1);
+    int dy = (y2 - y1 >= 0 ? 1 : -1);
+    // Проекции на оси
+    int lengthX = abs(x2 - x1);
+    int lengthY = abs(y2 - y1);
+    //  Не является ли отрезок точкой
+    int length = max(lengthX, lengthY);
+    if(length == 0) {
         setPixel(x1, y1, color);
-  }
-  // Основная ось - X
-  if (lengthY <= lengthX)
-  {
+    }
+    // Основная ось - X
+    if(lengthY <= lengthX) {
         // Начальные значения
         int x = x1;
         int y = y1;
@@ -61,35 +61,34 @@ void SoftwareRender::drawLine(int x1, int y1, int x2, int y2, uint32_t color) {
 
         // Основной цикл
         length++;
-        while(length--)
-        {
-              setPixel(x, y, color);
-              x += dx;
-              d += lengthY << 1; // * 2
-              if (d > 0) {
-                    d -= lengthX << 1; 
-                    y += dy;
-              }
+        while(length--) {
+            setPixel(x, y, color);
+            x += dx;
+            d += lengthY << 1; // * 2
+            if(d > 0) {
+                d -= lengthX << 1;
+                y += dy;
+            }
         }
-  }
-  else
-  {
+    } else {
         // Начальные значения
         int x = x1;
         int y = y1;
-        int d = - lengthY;
+        int d = -lengthY;
 
         // Основной цикл
         length++;
-        while(length--)
-        {
-              setPixel(x, y, color);
-              y += dy;
-              d += lengthX << 1;
-              if (d > 0) {
-                    d -= lengthY << 1;
-                    x += dx;
-              }
+        while(length--) {
+            setPixel(x, y, color);
+            y += dy;
+            d += lengthX << 1;
+            if(d > 0) {
+                d -= lengthY << 1;
+                x += dx;
+            }
         }
-  }
+    }
+}
+void SoftwareRender::setTransformMatrix(Mat4 transMatrix) {
+    this->transMatrix = transMatrix;
 }
