@@ -9,9 +9,13 @@ class SoftwareRender {
   private:
     int width, height;
     uint32_t* pixels;
+    // Matrix ndc => screen coords
+    Mat4 screenMatrix;
+    // Maint transform matrix ( = screen * trans)
     Mat4 transMatrix;
     inline int pixelIndex(int x, int y);
-    inline void setPixelUnsafe(int x, int y, uint32_t color);    
+    inline void setPixelUnsafe(int x, int y, uint32_t color);  
+    inline bool isInClipBox(Vec3f v) const;
   public:
     SoftwareRender(int renderWidth, int renderHeight, uint32_t* renderOutput);
     ~SoftwareRender();

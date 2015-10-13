@@ -2,6 +2,13 @@
 #include "SDL2/SDL.h"
 #include <algorithm>
 
+/**
+ * @brief Start instance of SDLApp
+ * @param width window width
+ * @param height window height
+ * @param handler poiner to app handler object [IAppHandler]
+ * @return 
+ */
 bool
 SDLApp::start(unsigned int width, unsigned int height, IAppHandler* handler) {
     scrWidth = width;
@@ -66,6 +73,10 @@ SDLApp::start(unsigned int width, unsigned int height, IAppHandler* handler) {
     return true;
 }
 
+/**
+ * @brief get reference to instance of singleton
+ * @return 
+ */
 SDLApp& SDLApp::getInstance() {
     static SDLApp inst;
     return inst;

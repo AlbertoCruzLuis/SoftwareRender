@@ -5,14 +5,30 @@
 #include <SDL2/SDL_events.h>
 class SDLApp;
 
+/**
+ * @class IAppHandler
+ * @brief interface of app handler
+ */
 class IAppHandler {
-  public:
+public:
+    /**
+    * @brief on app init
+    */
     virtual void onInit() = 0;
-    // Рендер как параметр для, более лаконичного вызова методов
-    // отрисовки чего-либо
+    /**
+     * @brief on each frame draw
+     * @param render passed by renderer, current renderer reference
+     */
     virtual void onDraw(SoftwareRender& render) = 0;
-    // Параметры - delta-time и последнее событие
+    /**
+     * @brief after each frame
+     * @param dt time from last onProc invoke
+     * @param lastEvent last SDL event (pool)
+     */
     virtual void onProc(double dt, SDL_Event& lastEvent) = 0;
+    /**
+     * @brief on app exit
+     */
     virtual void onExit() = 0;
 };
 

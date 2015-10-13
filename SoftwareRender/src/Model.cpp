@@ -4,12 +4,12 @@
 #include <sstream>
 #include <string>
 #include <iostream>
-#include "Mat4.h"
 
-
+/**
+ * @brief Constructor
+ * @param filename path to model
+ */
 Model::Model(const char* filename) {
-    //mat4 matrix;
-    //matrix.doScale(0.5);
     //Открываем файл
     std::ifstream in;
     in.open(filename, std::ifstream::in);
@@ -56,10 +56,21 @@ Model::Model(const char* filename) {
 Model::~Model() {
 }
 
+/**
+ * @brief Get face info of model with index [idx]
+ * @param idx index
+ * @return 
+ */
 std::vector<VertexInfo>& Model::face(int idx) {
     return faces[idx];
 }
 
+/**
+ * @brief Get vertex of model
+ * @param face face index
+ * @param n index of vertex in face
+ * @return Vec3f point
+ */
 Vec3f& Model::vert(int face, int n) {
     return verts[faces[face][n].vi];
 }
