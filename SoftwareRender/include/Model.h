@@ -11,12 +11,12 @@ struct VertexInfo {
 };
 
 class Model {
-  private:
+    
     std::vector<Vec3f> verts;
     std::vector<Vec3f> normals;
     std::vector<Vec2f> uvs;
     std::vector<std::vector<VertexInfo>> faces;
-
+    
   public:
     Model(const char* filename);
     int vertsCount();

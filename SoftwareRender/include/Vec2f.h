@@ -14,4 +14,29 @@ struct Vec2f {
     
 };
 
+
+/**
+ * @brief add
+ * @return a + b
+ */
+inline Vec2f operator+(Vec2f a, Vec2f b) {
+    return {a.x+b.x, a.y+b.y};
+}
+
+/**
+ * @brief sub
+ * @return a + b
+ */
+inline Vec2f operator-(Vec2f a, Vec2f b) {
+    return {a.x-b.x, a.y-b.y};
+}
+
+/**
+ * @brief sub
+ * @return a + b
+ */
+inline Vec2f operator*(Vec2f a, float b) {
+    return {a.x*b, a.y*b};
+}
+
 #endif // VEC2F_H

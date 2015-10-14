@@ -17,7 +17,7 @@ class TestApp : public IAppHandler {
     Mat4 projMatrix;
     Mat4 tMat;
     float n = 1;
-    float f = 2.5;
+    float f = 5;
     double time;
   public:
     virtual void onInit() {
@@ -29,10 +29,11 @@ class TestApp : public IAppHandler {
     virtual void onDraw(SoftwareRender& render) {
         render.setTransformMatrix(projMatrix * modelMatrix * tMat);
         render.clear(0);        
+        Vec3f tri[3];
         for(int i = 0; i < model->facesCount(); i++) {
-            render.drawLine(model->vert(i, 0), model->vert(i, 1));
-            render.drawLine(model->vert(i, 1), model->vert(i, 2));
-            render.drawLine(model->vert(i, 2), model->vert(i, 0));
+            for (int j = 0; j < 3; j++)
+                tri[j] = model->vert(i, j);
+            render.drawTriangle(tri);
         }
     };
     virtual void onProc(double dt, SDL_Event& lastEvent){
