@@ -1,6 +1,8 @@
 #include "SoftwareRender.h"
 #include <cmath>
 #include <algorithm>
+#include "Vec3f.h"
+#include "Vec2f.h"
 #include "Mat4.h"
 #include <iostream>
 
@@ -67,16 +69,15 @@ bool SoftwareRender::isInClipBox(Vec3f v) const{
  * @param v2 second point
  * @param color color of line
  */
-void SoftwareRender::drawLine(Vec3f v1, Vec3f v2, uint32_t color) {
-    v1 = transMatrix.transformVec(v1);
-    v2 = transMatrix.transformVec(v2);
+void SoftwareRender::drawLine(Vec3f v1, Vec3f v2, uint32_t color, bool direct) {
+    if (!direct) {
+        v1 = transMatrix.transformVec(v1);
+        v2 = transMatrix.transformVec(v2);
     if (!(isInClipBox(v1) && isInClipBox(v2)))
         return;
-    //if (v1.z < 0)
-    //std::cout << "v1: " << v1.x << ';' << v1.y << ';' << v1.z << endl;
-    
-    v1 = screenMatrix.transformVec(v1);
-    v2 = screenMatrix.transformVec(v2);     
+        v1 = screenMatrix.transformVec(v1);
+        v2 = screenMatrix.transformVec(v2);         
+    }
     int x1 = v1.x, x2 = v2.x, y1 = v1.y, y2 = v2.y;
     // В какую сторону смещаемся.
     int dx = (x2 - x1 >= 0 ? 1 : -1);
@@ -125,6 +126,69 @@ void SoftwareRender::drawLine(Vec3f v1, Vec3f v2, uint32_t color) {
             }
         }
     }
+}
+
+void SoftwareRender::drawTriangle(Vec3f modelVerts[3], uint32_t color) {
+    
+    Vec3f verts3D[3] =  {
+        transMatrix.transformVec(modelVerts[0]),
+        transMatrix.transformVec(modelVerts[1]),
+        transMatrix.transformVec(modelVerts[2])};   
+ /*
+    if (verts3D[0].y>verts3D[1].y) std::swap(verts3D[0], verts3D[1]);
+    if (verts3D[0].y>verts3D[2].y) std::swap(verts3D[0], verts3D[2]);
+    if (verts3D[1].y>verts3D[2].y) std::swap(verts3D[1], verts3D[2]);
+            */
+    if(!(isInClipBox(verts3D[0]) && isInClipBox(verts3D[1]) &&
+         isInClipBox(verts3D[2])))
+        return;
+    Vec2f verts[3];
+    for (int i = 0; i < 3; i++) {
+        Vec3f tmpVec;
+        tmpVec = screenMatrix.transformVec(verts3D[i]); 
+        verts[i].x = tmpVec.x;
+        verts[i].y = tmpVec.y;
+    }
+
+
+
+    Vec3f n = ((verts3D[1]-verts3D[0])^(verts3D[2]-verts3D[0])).norm();
+    float intensity = n*Vec3f(0,0,1);
+    std::cout << intensity << ";  " <<endl;
+    
+    if (intensity < 0)
+        return;
+    
+    if (verts[0].y>verts[1].y) std::swap(verts[0], verts[1]);
+    if (verts[0].y>verts[2].y) std::swap(verts[0], verts[2]);
+    if (verts[1].y>verts[2].y) std::swap(verts[1], verts[2]);
+    
+    if (verts[0].y==verts[1].y && verts[0].y==verts[2].y) 
+        return; 
+    // sort the verts3D by y
+    int total_height = verts[2].y-verts[0].y;
+    for (int i=0; i<total_height; i++) {
+        bool second_half = i>verts[1].y-verts[0].y || verts[1].y==verts[0].y;
+        int segment_height = second_half ? verts[2].y-verts[1].y : verts[1].y-verts[0].y;
+        float alpha = (float)i/total_height;
+        float beta  = (float)(i-(second_half ? verts[1].y-verts[0].y : 0))/segment_height; // be careful: with above conditions no division by zero here
+        Vec2f A =               verts[0] + (verts[2]-verts[0])*alpha;
+        Vec2f B = second_half ? verts[1] + (verts[2]-verts[1])*beta : verts[0] + (verts[1]-verts[0])*beta;
+        if (A.x>B.x) std::swap(A, B);
+        for (int j=A.x; j<=B.x; j++) {
+            uint8_t c = (uint8_t)(0xFF*intensity);
+            uint32_t cc = (c<<24)|(c<<16)|(c<<8)|0xFF;
+            setPixel(j,(int)(verts[0].y+i),cc);
+        }
+    }
+
+/*
+    if (intensity>0) {
+        drawLine(verts[0],verts[1],0xFFFFFFFF,true);
+        drawLine(verts[1],verts[2],0xFFFFFFFF,true);
+        drawLine(verts[2],verts[0],0xFFFFFFFF,true);
+    }*/
+
 }
 
 /**
