@@ -134,11 +134,9 @@ void SoftwareRender::drawTriangle(Vec3f modelVerts[3], uint32_t color) {
         transMatrix.transformVec(modelVerts[0]),
         transMatrix.transformVec(modelVerts[1]),
         transMatrix.transformVec(modelVerts[2])};   
- /*
-    if (verts3D[0].y>verts3D[1].y) std::swap(verts3D[0], verts3D[1]);
-    if (verts3D[0].y>verts3D[2].y) std::swap(verts3D[0], verts3D[2]);
-    if (verts3D[1].y>verts3D[2].y) std::swap(verts3D[1], verts3D[2]);
-            */
+ 
+
+            
     if(!(isInClipBox(verts3D[0]) && isInClipBox(verts3D[1]) &&
          isInClipBox(verts3D[2])))
         return;
@@ -150,6 +148,9 @@ void SoftwareRender::drawTriangle(Vec3f modelVerts[3], uint32_t color) {
         verts[i].y = tmpVec.y;
     }
 
+    if (verts[0].y>verts[1].y) std::swap(verts[0], verts[1]);
+    if (verts[0].y>verts[2].y) std::swap(verts[0], verts[2]);
+    if (verts[1].y>verts[2].y) std::swap(verts[1], verts[2]);
 
 
     Vec3f n = ((verts3D[1]-verts3D[0])^(verts3D[2]-verts3D[0])).norm();
