@@ -1,1 +1,1 @@
-./Debug/src_main.cpp.o ./Debug/src_SDLApp.cpp.o ./Debug/src_SoftwareRender.cpp.o ./Debug/src_Model.cpp.o
+./bin_debug_win32/src_main.cpp.o ./bin_debug_win32/src_SDLApp.cpp.o ./bin_debug_win32/src_SoftwareRender.cpp.o ./bin_debug_win32/src_Model.cpp.o   

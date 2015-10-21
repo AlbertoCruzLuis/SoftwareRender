@@ -62,6 +62,17 @@ inline float operator*(Vec3f a, Vec3f b) {
 }
 
 /**
+ * @brief Dot product
+ * @return a * b
+ */
+inline Vec3f operator*(Vec3f a, float b) {
+    /*
+     *  d = a.x*b.x + a.y*b.y + a.z*b.z
+     */
+    return {a.x*b, a.y*b, a.z*b};
+}
+
+/**
  * @brief add
  * @return a + b
  */

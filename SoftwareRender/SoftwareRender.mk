@@ -2,21 +2,21 @@
 ## Auto Generated makefile by CodeLite IDE
 ## any manual changes will be erased      
 ##
-## Debug
+## Debug_Win
 ProjectName            :=SoftwareRender
-ConfigurationName      :=Debug
-WorkspacePath          := "/home/pacmancoder/Dropbox/SoftwareRender"
-ProjectPath            := "/home/pacmancoder/Dropbox/SoftwareRender/SoftwareRender"
-IntermediateDirectory  :=./Debug
+ConfigurationName      :=Debug_Win
+WorkspacePath          := "C:\code\SoftwareRender"
+ProjectPath            := "C:\code\SoftwareRender\SoftwareRender"
+IntermediateDirectory  :=./bin_debug_win32
 OutDir                 := $(IntermediateDirectory)
 CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
-User                   :=pacmancoder
-Date                   :=14/10/15
-CodeLitePath           :="/home/pacmancoder/.codelite"
-LinkerName             :=/usr/bin/g++
-SharedObjectLinkerName :=/usr/bin/g++ -shared -fPIC
+User                   :=Vladislav
+Date                   :=21/10/2015
+CodeLitePath           :="C:\Program Files\CodeLite"
+LinkerName             :=C:/TDM-GCC-32/bin/g++.exe
+SharedObjectLinkerName :=C:/TDM-GCC-32/bin/g++.exe -shared -fPIC
 ObjectSuffix           :=.o
 DependSuffix           :=.o.d
 PreprocessSuffix       :=.i
@@ -34,32 +34,34 @@ ArchiveOutputSwitch    :=
 PreprocessOnlySwitch   :=-E
 ObjectsFileList        :="SoftwareRender.txt"
 PCHCompileFlags        :=
-MakeDirCommand         :=mkdir -p
+MakeDirCommand         :=makedir
+RcCmpOptions           := 
+RcCompilerName         :=C:/TDM-GCC-32/bin/windres.exe
 LinkOptions            :=  
-IncludePath            :=  $(IncludeSwitch). $(IncludeSwitch). $(IncludeSwitch)include 
+IncludePath            :=  $(IncludeSwitch). $(IncludeSwitch). $(IncludeSwitch)include $(IncludeSwitch)SDL2/include 
 IncludePCH             := 
 RcIncludePath          := 
-Libs                   := $(LibrarySwitch)SDL2 
-ArLibs                 :=  "SDL2" 
-LibPath                := $(LibraryPathSwitch). 
+Libs                   := $(LibrarySwitch)mingw32 $(LibrarySwitch)SDL2main $(LibrarySwitch)SDL2 
+ArLibs                 :=  "mingw32" "SDL2main" "SDL2" 
+LibPath                := $(LibraryPathSwitch). $(LibraryPathSwitch)SDL2/lib 
 
 ##
 ## Common variables
 ## AR, CXX, CC, AS, CXXFLAGS and CFLAGS can be overriden using an environment variables
 ##
-AR       := /usr/bin/ar rcu
-CXX      := /usr/bin/g++
-CC       := /usr/bin/gcc
+AR       := C:/TDM-GCC-32/bin/ar.exe rcu
+CXX      := C:/TDM-GCC-32/bin/g++.exe
+CC       := C:/TDM-GCC-32/bin/gcc.exe
 CXXFLAGS :=  -g -O0 -std=c++14 -std=c++11 -Wall $(Preprocessors)
 CFLAGS   :=  -g -O0 -Wall $(Preprocessors)
 ASFLAGS  := 
-AS       := /usr/bin/as
+AS       := C:/TDM-GCC-32/bin/as.exe
 
 
 ##
 ## User defined environment variables
 ##
-CodeLiteDir:=/usr/share/codelite
+CodeLiteDir:=C:\Program Files\CodeLite
 Objects0=$(IntermediateDirectory)/src_main.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_SDLApp.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_SoftwareRender.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_Model.cpp$(ObjectSuffix) 
 
 
@@ -79,11 +81,11 @@ $(OutputFile): $(IntermediateDirectory)/.d $(Objects)
 	$(LinkerName) $(OutputSwitch)$(OutputFile) @$(ObjectsFileList) $(LibPath) $(Libs) $(LinkOptions)
 
 MakeIntermediateDirs:
-	@test -d ./Debug || $(MakeDirCommand) ./Debug
+	@$(MakeDirCommand) "./bin_debug_win32"
 
 
 $(IntermediateDirectory)/.d:
-	@test -d ./Debug || $(MakeDirCommand) ./Debug
+	@$(MakeDirCommand) "./bin_debug_win32"
 
 PreBuild:
 
@@ -92,7 +94,7 @@ PreBuild:
 ## Objects
 ##
 $(IntermediateDirectory)/src_main.cpp$(ObjectSuffix): src/main.cpp $(IntermediateDirectory)/src_main.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/pacmancoder/Dropbox/SoftwareRender/SoftwareRender/src/main.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/src_main.cpp$(ObjectSuffix) $(IncludePath)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/code/SoftwareRender/SoftwareRender/src/main.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/src_main.cpp$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_main.cpp$(DependSuffix): src/main.cpp
 	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/src_main.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/src_main.cpp$(DependSuffix) -MM "src/main.cpp"
 
@@ -100,7 +102,7 @@ $(IntermediateDirectory)/src_main.cpp$(PreprocessSuffix): src/main.cpp
 	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_main.cpp$(PreprocessSuffix) "src/main.cpp"
 
 $(IntermediateDirectory)/src_SDLApp.cpp$(ObjectSuffix): src/SDLApp.cpp $(IntermediateDirectory)/src_SDLApp.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/pacmancoder/Dropbox/SoftwareRender/SoftwareRender/src/SDLApp.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/src_SDLApp.cpp$(ObjectSuffix) $(IncludePath)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/code/SoftwareRender/SoftwareRender/src/SDLApp.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/src_SDLApp.cpp$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_SDLApp.cpp$(DependSuffix): src/SDLApp.cpp
 	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/src_SDLApp.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/src_SDLApp.cpp$(DependSuffix) -MM "src/SDLApp.cpp"
 
@@ -108,7 +110,7 @@ $(IntermediateDirectory)/src_SDLApp.cpp$(PreprocessSuffix): src/SDLApp.cpp
 	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_SDLApp.cpp$(PreprocessSuffix) "src/SDLApp.cpp"
 
 $(IntermediateDirectory)/src_SoftwareRender.cpp$(ObjectSuffix): src/SoftwareRender.cpp $(IntermediateDirectory)/src_SoftwareRender.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/pacmancoder/Dropbox/SoftwareRender/SoftwareRender/src/SoftwareRender.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/src_SoftwareRender.cpp$(ObjectSuffix) $(IncludePath)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/code/SoftwareRender/SoftwareRender/src/SoftwareRender.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/src_SoftwareRender.cpp$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_SoftwareRender.cpp$(DependSuffix): src/SoftwareRender.cpp
 	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/src_SoftwareRender.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/src_SoftwareRender.cpp$(DependSuffix) -MM "src/SoftwareRender.cpp"
 
@@ -116,7 +118,7 @@ $(IntermediateDirectory)/src_SoftwareRender.cpp$(PreprocessSuffix): src/Software
 	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_SoftwareRender.cpp$(PreprocessSuffix) "src/SoftwareRender.cpp"
 
 $(IntermediateDirectory)/src_Model.cpp$(ObjectSuffix): src/Model.cpp $(IntermediateDirectory)/src_Model.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/pacmancoder/Dropbox/SoftwareRender/SoftwareRender/src/Model.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/src_Model.cpp$(ObjectSuffix) $(IncludePath)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/code/SoftwareRender/SoftwareRender/src/Model.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/src_Model.cpp$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_Model.cpp$(DependSuffix): src/Model.cpp
 	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/src_Model.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/src_Model.cpp$(DependSuffix) -MM "src/Model.cpp"
 
@@ -129,6 +131,6 @@ $(IntermediateDirectory)/src_Model.cpp$(PreprocessSuffix): src/Model.cpp
 ## Clean
 ##
 clean:
-	$(RM) -r ./Debug/
+	$(RM) -r ./bin_debug_win32/
 
 
