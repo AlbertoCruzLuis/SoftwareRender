@@ -23,8 +23,6 @@ class SDLApp {
     SDL_Texture* sdlTexture;
     // Экземпляр рендера
     SoftwareRender* renderer;
-    // Массив точек поверхности рендера в формате RGBA, 8 бит на канал
-    uint32_t* pixels;
     // Для получения delta-time
     float dt;
     // Размеры экрана

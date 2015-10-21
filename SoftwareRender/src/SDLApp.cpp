@@ -26,12 +26,8 @@ SDLApp::start(unsigned int width, unsigned int height, IAppHandler* handler) {
                                    SDL_TEXTUREACCESS_STREAMING,
                                    width,
                                    height);
-    // Выделение памяти под массив данных о экране, и инициализируем в
-    // 0xFFFFFFFF
-    pixels = new uint32_t[width * height];
-    std::fill_n(pixels, width * height, 0xFFFFFFFF);
     // Создаём экземпляр рендера
-    renderer = new SoftwareRender(width, height, pixels);
+    renderer = new SoftwareRender(width, height);
     // Вызываем оперделяемый пользователем метод инициализации
     handler->onInit();
     // Main loop
@@ -56,7 +52,7 @@ SDLApp::start(unsigned int width, unsigned int height, IAppHandler* handler) {
         handler->onDraw(*renderer);
         // Обновляем данные текстуры
         SDL_UpdateTexture(
-            sdlTexture, nullptr, pixels, width * sizeof(uint32_t));
+            sdlTexture, nullptr, renderer->getPixelsPtr(), width * sizeof(uint32_t));
         // Очистка  экрана и копирования содержания текстуры на него
         SDL_RenderClear(sdlRenderer);
         SDL_RenderCopy(sdlRenderer, sdlTexture, nullptr, nullptr);
@@ -87,7 +83,6 @@ SDLApp::SDLApp() {
 
 SDLApp::~SDLApp() {
     delete renderer;
-    delete[] pixels;
     SDL_DestroyTexture(sdlTexture);
     SDL_DestroyRenderer(sdlRenderer);
     SDL_Quit();

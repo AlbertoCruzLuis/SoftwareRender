@@ -3,6 +3,7 @@
 #include <algorithm>
 #include "Vec3f.h"
 #include "Vec2f.h"
+#include "Vec3i.h"
 #include "Mat4.h"
 #include <iostream>
 
@@ -17,8 +18,7 @@ using namespace std;
  * @param renderOutput memory block pointer with size w*h*4
  */
 SoftwareRender::SoftwareRender(int renderWidth,
-                               int renderHeight,
-                               uint32_t* renderOutput) {
+                               int renderHeight) {
     // reset matrixes
     screenMatrix =
         Mat4::newTranslate(renderWidth/2.,renderHeight/2.,0) * 
@@ -26,10 +26,14 @@ SoftwareRender::SoftwareRender(int renderWidth,
     setTransformMatrix(Mat4::newIdentity());
     width = renderWidth;
     height = renderHeight;
-    pixels = renderOutput;
+    pixels = new uint32_t[width*height];
+    zBuffer = new int[width*height];
+    clear(0);
 }
 
 SoftwareRender::~SoftwareRender() {
+    delete[] pixels;
+    delete[] zBuffer;
 }
 
 void SoftwareRender::setPixel(int x, int y, uint32_t color) {
@@ -45,6 +49,7 @@ void SoftwareRender::setPixel(int x, int y, uint32_t color) {
  */
 void SoftwareRender::clear(uint32_t color) {
     std::fill_n(pixels, width * height, color);
+    std::fill_n(zBuffer, width * height, MIN_Z_BUFFER);
 }
 
 int SoftwareRender::pixelIndex(int x, int y) {
@@ -135,61 +140,62 @@ void SoftwareRender::drawTriangle(Vec3f modelVerts[3], uint32_t color) {
         transMatrix.transformVec(modelVerts[1]),
         transMatrix.transformVec(modelVerts[2])};   
  
-
-            
     if(!(isInClipBox(verts3D[0]) && isInClipBox(verts3D[1]) &&
          isInClipBox(verts3D[2])))
         return;
-    Vec2f verts[3];
-    for (int i = 0; i < 3; i++) {
-        Vec3f tmpVec;
-        tmpVec = screenMatrix.transformVec(verts3D[i]); 
-        verts[i].x = tmpVec.x;
-        verts[i].y = tmpVec.y;
-    }
-
-    if (verts[0].y>verts[1].y) std::swap(verts[0], verts[1]);
-    if (verts[0].y>verts[2].y) std::swap(verts[0], verts[2]);
-    if (verts[1].y>verts[2].y) std::swap(verts[1], verts[2]);
-
-
+        
+    // calc triangle normal
     Vec3f n = ((verts3D[1]-verts3D[0])^(verts3D[2]-verts3D[0])).norm();
     float intensity = n*Vec3f(0,0,1);
-    std::cout << intensity << ";  " <<endl;
-    
+
+    //back-face culling
     if (intensity < 0)
         return;
     
+    // get points in screen coords, int's
+    Vec3f verts[3];
+    for (int i = 0; i < 3; i++) {
+        Vec3f tmpVec;
+        tmpVec = screenMatrix.transformVec(verts3D[i]); 
+        verts[i].x = (int)(tmpVec.x);
+        verts[i].y = (int)(tmpVec.y);
+        verts[i].z = (tmpVec.z) * MIN_Z_BUFFER;
+    }
+    
+    //sort 2d verts in screen-coords
     if (verts[0].y>verts[1].y) std::swap(verts[0], verts[1]);
     if (verts[0].y>verts[2].y) std::swap(verts[0], verts[2]);
     if (verts[1].y>verts[2].y) std::swap(verts[1], verts[2]);
     
+    //triangle is line, do not draw
     if (verts[0].y==verts[1].y && verts[0].y==verts[2].y) 
         return; 
-    // sort the verts3D by y
-    int total_height = verts[2].y-verts[0].y;
-    for (int i=0; i<total_height; i++) {
-        bool second_half = i>verts[1].y-verts[0].y || verts[1].y==verts[0].y;
-        int segment_height = second_half ? verts[2].y-verts[1].y : verts[1].y-verts[0].y;
+    uint8_t c = (uint8_t)(0xFF*intensity);
+    uint32_t cc = (c<<24)|(c<<16)|(c<<8)|0xFF;
+    // rasterization
+    int total_height = verts[2].y-verts[0].y; // triangle height
+    for (int i=0; i<total_height; i++) { // for all lines in height
+        // Check what part of triangle we rasterizate
+        bool second_half = (i > verts[1].y-verts[0].y) || (verts[1].y == verts[0].y);
+        int segment_height = second_half ? (verts[2].y-verts[1].y) : (verts[1].y-verts[0].y);
         float alpha = (float)i/total_height;
-        float beta  = (float)(i-(second_half ? verts[1].y-verts[0].y : 0))/segment_height; // be careful: with above conditions no division by zero here
-        Vec2f A =               verts[0] + (verts[2]-verts[0])*alpha;
-        Vec2f B = second_half ? verts[1] + (verts[2]-verts[1])*beta : verts[0] + (verts[1]-verts[0])*beta;
-        if (A.x>B.x) std::swap(A, B);
+        float beta  = (float)(i - (second_half ? (verts[1].y-verts[0].y) : 0))/segment_height; 
+        // int vector, for rounding; find left and right limits of triangle line
+        Vec3i A =               verts[0] + (verts[2]-verts[0])*alpha;
+        Vec3i B = second_half ? (verts[1] + (verts[2]-verts[1])*beta) : (verts[0] + (verts[1]-verts[0])*beta);
+        if (A.x>B.x) std::swap(A, B); // for goes from left to right
         for (int j=A.x; j<=B.x; j++) {
-            uint8_t c = (uint8_t)(0xFF*intensity);
-            uint32_t cc = (c<<24)|(c<<16)|(c<<8)|0xFF;
-            setPixel(j,(int)(verts[0].y+i),cc);
+            float phi = B.x==A.x ? 1. : (float)(j-A.x)/(float)(B.x-A.x);
+            auto Af = (Vec3f)A, Bf = (Vec3f)B;
+            Vec3i P = Af + (Bf-Af)*phi;
+            int idx = P.x+P.y*width;
+            if (zBuffer[idx] < (P.z)) {
+                zBuffer[idx] = (P.z);
+                setPixel(P.x, P.y, cc);
+            }
+
         }
     }
-
-/*
-    if (intensity>0) {
-        drawLine(verts[0],verts[1],0xFFFFFFFF,true);
-        drawLine(verts[1],verts[2],0xFFFFFFFF,true);
-        drawLine(verts[2],verts[0],0xFFFFFFFF,true);
-    }*/
-
 }
 
 /**
