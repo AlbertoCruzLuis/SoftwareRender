@@ -127,6 +127,15 @@ struct Mat4 {
         return tmp;
     }
     
+    static Mat4 newOrtho(float halfW, float halfH, float n, float f) {
+        Mat4 tmp;
+        tmp[0][0] = 1/halfW;
+        tmp[1][1] = 1/halfH;
+        tmp[2][2] = -2/(f-n);
+        tmp[2][3] = -(f+n)/(f-n);
+        tmp[3][3] = 1;
+        return tmp;
+    }    
 };
 
 #endif // MAT4_H

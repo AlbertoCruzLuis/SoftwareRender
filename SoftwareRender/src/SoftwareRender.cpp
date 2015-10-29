@@ -133,69 +133,70 @@ void SoftwareRender::drawLine(Vec3f v1, Vec3f v2, uint32_t color, bool direct) {
     }
 }
 
-void SoftwareRender::drawTriangle(Vec3f modelVerts[3], uint32_t color) {
-    
-    Vec3f verts3D[3] =  {
-        transMatrix.transformVec(modelVerts[0]),
-        transMatrix.transformVec(modelVerts[1]),
-        transMatrix.transformVec(modelVerts[2])};   
- 
-    if(!(isInClipBox(verts3D[0]) && isInClipBox(verts3D[1]) &&
-         isInClipBox(verts3D[2])))
+void SoftwareRender::drawTriangle(ModelVert _mVerts[3], uint32_t color) {
+    ModelVert mVerts[3];
+    std::copy_n(_mVerts,3,mVerts);
+    mVerts[0].pos = transMatrix.transformVec(mVerts[0].pos);
+    mVerts[1].pos = transMatrix.transformVec(mVerts[1].pos);
+    mVerts[2].pos = transMatrix.transformVec(mVerts[2].pos);
+    mVerts[0].normal = transMatrix.transformVec(mVerts[0].normal).norm()*(-1);
+    mVerts[1].normal = transMatrix.transformVec(mVerts[1].normal).norm()*(-1);
+    mVerts[2].normal = transMatrix.transformVec(mVerts[2].normal).norm()*(-1);
+
+    if(!(isInClipBox(mVerts[0].pos) && isInClipBox(mVerts[1].pos) &&
+         isInClipBox(mVerts[2].pos)))
         return;
         
     // calc triangle normal
-    Vec3f n = ((verts3D[1]-verts3D[0])^(verts3D[2]-verts3D[0])).norm();
+    Vec3f n = ((mVerts[1].pos-mVerts[0].pos)^(mVerts[2].pos-mVerts[0].pos)).norm();
     float intensity = n*Vec3f(0,0,1);
 
     //back-face culling
     if (intensity < 0)
         return;
     
-    // get points in screen coords, int's
-    Vec3f verts[3];
+    uint8_t cg = (uint8_t)(intensity*0xFF);
+    uint32_t c  = (cg << 24)|(cg << 16)|(cg << 8)|0xFF;
+    
+    Vec3f mVertsScr[3];
+    Vec3f mVertsScrTmp[3];
+
     for (int i = 0; i < 3; i++) {
         Vec3f tmpVec;
-        tmpVec = screenMatrix.transformVec(verts3D[i]); 
-        verts[i].x = (int)(tmpVec.x);
-        verts[i].y = (int)(tmpVec.y);
-        verts[i].z = (tmpVec.z) * MIN_Z_BUFFER;
+        tmpVec = screenMatrix.transformVec(mVerts[i].pos); 
+        mVertsScr[i].x = (int)(tmpVec.x);
+        mVertsScr[i].y = (int)(tmpVec.y);
+        mVertsScr[i].z = (tmpVec.z) * MIN_Z_BUFFER;
     }
+    std::copy_n(mVertsScr,3,mVertsScrTmp);
+    MathUtils::SortVerts(mVertsScr,0); //by X;
+    int BBxMin = (int)mVertsScr[0].x, BBxMax = (int)mVertsScr[2].x;
+    MathUtils::SortVerts(mVertsScr,1); // by Y;
+    int BByMin = (int)mVertsScr[0].y, BByMax = (int)mVertsScr[2].y;
+    std::copy_n(mVertsScrTmp,3,mVertsScr);
     
-    //sort 2d verts in screen-coords
-    if (verts[0].y>verts[1].y) std::swap(verts[0], verts[1]);
-    if (verts[0].y>verts[2].y) std::swap(verts[0], verts[2]);
-    if (verts[1].y>verts[2].y) std::swap(verts[1], verts[2]);
     
-    //triangle is line, do not draw
-    if (verts[0].y==verts[1].y && verts[0].y==verts[2].y) 
-        return; 
-    uint8_t c = (uint8_t)(0xFF*intensity);
-    uint32_t cc = (c<<24)|(c<<16)|(c<<8)|0xFF;
-    // rasterization
-    int total_height = verts[2].y-verts[0].y; // triangle height
-    for (int i=0; i<total_height; i++) { // for all lines in height
-        // Check what part of triangle we rasterizate
-        bool second_half = (i > verts[1].y-verts[0].y) || (verts[1].y == verts[0].y);
-        int segment_height = second_half ? (verts[2].y-verts[1].y) : (verts[1].y-verts[0].y);
-        float alpha = (float)i/total_height;
-        float beta  = (float)(i - (second_half ? (verts[1].y-verts[0].y) : 0))/segment_height; 
-        // int vector, for rounding; find left and right limits of triangle line
-        Vec3i A =               verts[0] + (verts[2]-verts[0])*alpha;
-        Vec3i B = second_half ? (verts[1] + (verts[2]-verts[1])*beta) : (verts[0] + (verts[1]-verts[0])*beta);
-        if (A.x>B.x) std::swap(A, B); // for goes from left to right
-        for (int j=A.x; j<=B.x; j++) {
-            float phi = B.x==A.x ? 1. : (float)(j-A.x)/(float)(B.x-A.x);
-            auto Af = (Vec3f)A, Bf = (Vec3f)B;
-            Vec3i P = Af + (Bf-Af)*phi;
-            int idx = P.x+P.y*width;
-            if (zBuffer[idx] < (P.z)) {
-                zBuffer[idx] = (P.z);
-                setPixel(P.x, P.y, cc);
+    for (int i = BByMin; i <= BByMax; i++) {
+        for (int j = BBxMin; j <= BBxMax; j++) {
+            int idx = j+i*width;
+            Vec3f P(j,i,0);
+            Vec3f bar = MathUtils::Barycentric(mVertsScr[0],mVertsScr[1],mVertsScr[2],P);
+            P.z = mVertsScr[0].z*bar[0] + mVertsScr[1].z*bar[1] + mVertsScr[2].z*bar[2];
+            if ((bar[0] >= 0)&&(bar[1] >= 0)&&(bar[2] >= 0)&&(bar[0] <= 1)&&(bar[1] <= 1)&&(bar[2] <= 1)) {
+                if (zBuffer[idx] < (P.z)) {
+                    zBuffer[idx] = (P.z);
+                    n = (mVerts[0].normal *bar[0] + mVerts[1].normal *bar[1] + mVerts[2].normal *bar[2]);
+                    intensity = (n)*Vec3f(0,0,1);
+                    cg = (uint8_t)(0xFF*intensity);
+                    //cg = (uint8_t)((zBuffer[idx]/(float)MIN_Z_BUFFER)*0xFF);
+                    c = (cg<<24)|(cg<<16)|(cg<<8)|0xFF;
+                    //c &= 0x7AEECCDD;
+                    setPixel(j, i, c);
+                }
             }
-
-        }
-    }
+        }   
+    } 
+    
 }
 
 /**

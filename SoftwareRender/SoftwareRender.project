@@ -48,6 +48,7 @@
     <File Name="include/Vec2f.h"/>
     <File Name="include/Vec2i.h"/>
     <File Name="include/Vec3i.h"/>
+    <File Name="include/MathUtils.h"/>
   </VirtualDirectory>
   <VirtualDirectory Name="src">
     <File Name="src/main.cpp"/>

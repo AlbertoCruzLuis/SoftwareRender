@@ -56,4 +56,18 @@ inline Vec3i operator*(Vec3i a, int b) {
 }
 
 
+inline Vec3i operator^(Vec3i a, Vec3i b) {
+    /*
+     *          |   i   j   k  |
+     *  a x b = |  a.x a.y a.z |
+     *          |  b.x b.y b.z |
+     * 
+     */
+    Vec3i tmp;
+    tmp.x = a.y*b.z - a.z*b.y;
+    tmp.y = a.z*b.x - a.x*b.z;
+    tmp.z = a.x*b.y - a.y*b.x;
+    return tmp;
+}
+
 #endif // VEC3I_H

@@ -5,24 +5,18 @@
 #include "Vec3f.h"
 #include "Vec2f.h"
 
-// Информация о вершине треугольника, сожержит индексы
-struct VertexInfo {
-    int vi, uvi, ni;
+struct ModelVert {
+    Vec3f pos;
+    Vec3f normal;
+    Vec2f uv;
 };
 
 class Model {
-    
-    std::vector<Vec3f> verts;
-    std::vector<Vec3f> normals;
-    std::vector<Vec2f> uvs;
-    std::vector<std::vector<VertexInfo>> faces;
-    
+    std::vector<ModelVert> verts;
   public:
     Model(const char* filename);
     int vertsCount();
-    int facesCount();
-    Vec3f& vert(int face, int n);
-    std::vector<VertexInfo>& face(int idx);
+    ModelVert& vert(int idx);
     ~Model();
 };
 

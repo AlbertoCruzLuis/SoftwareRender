@@ -5,6 +5,8 @@
 #include <cstdint>
 #include "Mat4.h"
 #include "Vec3f.h"
+#include "MathUtils.h"
+#include "Model.h"
 
 const int MIN_Z_BUFFER = std::numeric_limits<int>::min();
 const int MAX_Z_BUFFER = std::numeric_limits<int>::max();
@@ -32,7 +34,7 @@ class SoftwareRender {
                   Vec3f v2,
                   uint32_t color = 0xFFFFFFFF,
                   bool direct = false);
-    void drawTriangle(Vec3f verts[3], uint32_t color = 0xFFFFFFFF);
+    void drawTriangle(ModelVert verts[3], uint32_t color = 0xFFFFFFFF);
     void setTransformMatrix(Mat4 transMatrix);
 };
 

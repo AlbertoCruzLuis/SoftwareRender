@@ -21,18 +21,21 @@ class TestApp : public IAppHandler {
     virtual void onInit() {
         // load our model of head
         model = new Model("../data/model.obj");
-        modelMatrix =  Mat4::newTranslate(0,0,-2);
+        modelMatrix =  Mat4::newTranslate(0,0,-1.7) * Mat4::newScale(0.5,0.5,0.5);
         time = 0;
+        //projMatrix = Mat4::newOrtho(1,1,1,10);
         projMatrix = 
-            Mat4::newPerspective(75 * DEG2RAD, 4./3., 1, 10);
+            Mat4::newPerspective(45 * DEG2RAD, 4./3., 1, 100);
     };
     virtual void onDraw(SoftwareRender& render) {
         render.setTransformMatrix(projMatrix * modelMatrix * tMat);
         render.clear(0);        
-        Vec3f tri[3];
-        for(int i = 0; i < model->facesCount(); i++) {
-            for (int j = 0; j < 3; j++)
-                tri[j] = model->vert(i, j);
+        ModelVert tri[3];
+            
+        for(int i = 0; i < model->vertsCount(); i+=3) {
+            for (int j = i; j < i+3; j++) {
+                tri[j-i] = model->vert(j);
+            }
             render.drawTriangle(tri);
         }
 
@@ -40,10 +43,10 @@ class TestApp : public IAppHandler {
     virtual void onProc(double dt, SDL_Event& lastEvent){
         time += dt;
         tMat =  
-            Mat4::newRotateX(time/2) * 
-            Mat4::newRotateY(time/2) * 
-            Mat4::newRotateZ(time/2);
-        
+            //Mat4::newTranslate(0,0,std::sin(time/2)) * 
+            Mat4::newRotateX(time/4) * 
+            Mat4::newRotateY(time/4) * 
+            Mat4::newRotateZ(time/4);
     };
     virtual void onExit() {
         delete model;
